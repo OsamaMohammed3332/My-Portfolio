@@ -161,18 +161,71 @@ async function fetchStats() {
 // Fetch and display portfolio info
 async function fetchPortfolio() {
 	try {
+		// console.log("Fetching portfolio data...");
 		const portfolioCollection = await getDocs(collection(db, "portfolio"));
+		// console.log("Portfolio data fetched:", portfolioCollection);
+
+		if (portfolioCollection.empty) {
+			console.log("No documents found in the portfolio collection");
+			return;
+		}
+
 		let portfolioHtml = "";
 		portfolioCollection.forEach((doc) => {
 			const project = doc.data();
+
+			// Handle the case where 'images ' (with space) is used instead of 'images'
+			const images = project["images "] || project.images || [];
+			const imageArray = Array.isArray(images) ? images : [images];
+
+			if (!project || !imageArray.length) {
+				console.error("Invalid project data:", project);
+				return;
+			}
+
+			const projectId = project.id;
+
+			// Create carousel indicators
+			let carouselIndicators = "";
+			imageArray.forEach((_, index) => {
+				carouselIndicators += `
+                    <li data-target="#carousel-${projectId}" data-slide-to="${index}" ${
+					index === 0 ? 'class="active"' : ""
+				}></li>
+                `;
+			});
+
+			// Create carousel items
+			let carouselItems = "";
+			imageArray.forEach((image, index) => {
+				carouselItems += `
+                    <div class="carousel-item ${index === 0 ? "active" : ""}">
+                        <img class="d-block w-100" src="${image}" alt="${
+					project.title
+				} image ${index + 1}">
+                    </div>
+                `;
+			});
+
 			portfolioHtml += `
 <div class="col-md-4">
-  <div class="work-box">
-    <a href="${project.imageUrl}" data-lightbox="gallery-${project.title}" title="${project.title}">
-      <div class="work-img">
-        <img src="${project.imageUrl}" alt="${project.title}" class="img-fluid" />
+  <div class="work-box" id="project-${projectId}">
+    <div id="carousel-${projectId}" class="carousel slide" data-ride="carousel">
+      <ol class="carousel-indicators">
+        ${carouselIndicators}
+      </ol>
+      <div class="carousel-inner">
+        ${carouselItems}
       </div>
-    </a>
+      <a class="carousel-control-prev" href="#carousel-${projectId}" role="button" data-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="sr-only">Previous</span>
+      </a>
+      <a class="carousel-control-next" href="#carousel-${projectId}" role="button" data-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="sr-only">Next</span>
+      </a>
+    </div>
     <div class="work-content">
       <div class="row">
         <div class="col-sm-8">
@@ -187,11 +240,63 @@ async function fetchPortfolio() {
   </div>
 </div>`;
 		});
-		document.querySelector("#work .row-work-content").innerHTML = portfolioHtml;
+
+		const portfolioContainer = document.querySelector(
+			"#work .row-work-content"
+		);
+		if (portfolioContainer) {
+			portfolioContainer.innerHTML = portfolioHtml;
+			// console.log("Portfolio HTML inserted into the DOM");
+
+			// Initialize carousels
+			$(".carousel").carousel();
+
+			// Check for project highlight after everything is loaded
+			setTimeout(highlightProject, 100);
+		} else {
+			console.error("Portfolio container not found in the DOM");
+		}
 	} catch (error) {
 		console.error("Error fetching portfolio info:", error);
 	}
 }
+
+function highlightProject() {
+	const urlParams = new URLSearchParams(window.location.search);
+	const projectId = urlParams.get("project");
+	if (projectId) {
+		const projectElement = document.getElementById(`project-${projectId}`);
+		if (projectElement) {
+			// Wait for any dynamic content to load
+			setTimeout(() => {
+				// Get the height of the fixed navbar
+				const navbarHeight = document.querySelector("nav").offsetHeight;
+
+				// Calculate the element's position relative to the viewport
+				const elementPosition = projectElement.getBoundingClientRect().top;
+
+				// Calculate the position to scroll to
+				const offsetPosition =
+					elementPosition + window.pageYOffset - navbarHeight;
+
+				// Scroll to the calculated position
+				window.scrollTo({
+					top: offsetPosition,
+					behavior: "smooth",
+				});
+
+				// Add a highlight effect
+				projectElement.style.boxShadow = "0 0 15px rgba(0,123,255,0.5)";
+				setTimeout(() => {
+					projectElement.style.boxShadow = "";
+				}, 3000);
+			}, 100);
+		}
+	}
+}
+
+// Call fetchPortfolio when the page loads
+document.addEventListener("DOMContentLoaded", fetchPortfolio);
 
 // Fetch and display contact info
 async function fetchContactInfo() {
