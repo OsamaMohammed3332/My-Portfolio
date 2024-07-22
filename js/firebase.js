@@ -161,9 +161,7 @@ async function fetchStats() {
 // Fetch and display portfolio info
 async function fetchPortfolio() {
 	try {
-		// console.log("Fetching portfolio data...");
 		const portfolioCollection = await getDocs(collection(db, "portfolio"));
-		// console.log("Portfolio data fetched:", portfolioCollection);
 
 		if (portfolioCollection.empty) {
 			console.log("No documents found in the portfolio collection");
@@ -174,7 +172,6 @@ async function fetchPortfolio() {
 		portfolioCollection.forEach((doc) => {
 			const project = doc.data();
 
-			// Handle the case where 'images ' (with space) is used instead of 'images'
 			const images = project["images "] || project.images || [];
 			const imageArray = Array.isArray(images) ? images : [images];
 
@@ -199,13 +196,39 @@ async function fetchPortfolio() {
 			let carouselItems = "";
 			imageArray.forEach((image, index) => {
 				carouselItems += `
-                    <div class="carousel-item ${index === 0 ? "active" : ""}">
-                        <img class="d-block w-100" src="${image}" alt="${
+					<div class="carousel-item ${index === 0 ? "active" : ""}">
+						<a href="${image}" data-lightbox="gallery-${projectId}" data-title="${
 					project.title
 				} image ${index + 1}">
-                    </div>
-                `;
+							<img class="d-block w-100 img-fluid" src="${image}" alt="${
+					project.title
+				} image ${index + 1}">
+						</a>
+					</div>
+				`;
 			});
+
+			// Buttons for the work section
+			const buttonsWork = `
+                ${
+									project.liveUrl
+										? `<a class="btn btn-outline-info fw-bold mr-2 mb-2 work-btn" href="${project.liveUrl}" target="_blank" role="button">Live</a>`
+										: ""
+								}
+                ${
+									project.sourceUrl
+										? `<a class="btn btn-outline-info fw-bold mr-2 mb-2 work-btn" href="${project.sourceUrl}" target="_blank" role="button">Source code</a>`
+										: ""
+								}
+            `;
+			// Role for the work section
+			const myRole = `
+                ${
+									project.role
+										? `<span class="w-role">${project.role}</span>`
+										: ""
+								}
+            `;
 
 			portfolioHtml += `
 <div class="col-md-4">
@@ -228,12 +251,19 @@ async function fetchPortfolio() {
     </div>
     <div class="work-content">
       <div class="row">
-        <div class="col-sm-8">
-          <h2 class="w-title">${project.title}</h2>
-          <div class="w-more">
-            <a class="btn btn-outline-info fw-bold" href="${project.liveUrl}" target="_blank" role="button" style="font-weight: bold">Live</a>
-            <a class="btn btn-outline-info fw-bold" href="${project.sourceUrl}" target="_blank" role="button" style="font-weight: bold">Source code</a>
+        <div class="col-sm-12">
+          <div class="d-flex flex-wrap align-items-center justify-content-between">
+                                        <h2 class="w-title">${
+																					project.title
+																				}</h2>
+                                        <div class="w-more">${myRole}</div>
+                                    </div>
+		  <hr>
+          <p class="w-description">${project.description || ""}</p>
+          <div class="w-more" id="buttons-work">
+            ${buttonsWork}
           </div>
+          
         </div>
       </div>
     </div>
@@ -246,8 +276,6 @@ async function fetchPortfolio() {
 		);
 		if (portfolioContainer) {
 			portfolioContainer.innerHTML = portfolioHtml;
-			// console.log("Portfolio HTML inserted into the DOM");
-
 			// Initialize carousels
 			$(".carousel").carousel();
 
@@ -294,9 +322,6 @@ function highlightProject() {
 		}
 	}
 }
-
-// Call fetchPortfolio when the page loads
-document.addEventListener("DOMContentLoaded", fetchPortfolio);
 
 // Fetch and display contact info
 async function fetchContactInfo() {

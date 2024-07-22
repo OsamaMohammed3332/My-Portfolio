@@ -1,12 +1,5 @@
-/*
-  Theme Name: DevFolio
-  Theme URL: https://bootstrapmade.com/devfolio-bootstrap-portfolio-html-template/
-  Author: BootstrapMade.com
-  License: https://bootstrapmade.com/license/
-*/
-
 /*======================================
-//--//-->   STYLES GENERALES
+//--//-->   STYLES
 ======================================*/
 
 body {
@@ -775,21 +768,21 @@ a:hover {
 	backface-visibility: hidden;
 	background-color: #fff;
 	transition: box-shadow 0.3s ease-in-out;
-	overflow: hidden; /* Add this to contain the transformed carousel */
+	overflow: hidden;
 }
 
 .work-box .carousel {
 	transition: all 1s;
 }
 
-.work-box:hover .carousel {
+.work-box:hover .d-block {
 	-webkit-transform: scale(1.1);
 	transform: scale(1.1);
 }
 
 .carousel-item img {
 	object-fit: cover;
-	height: 270px; /* Adjust this value as needed */
+	height: 290px; /* Adjust this value as needed */
 	width: 100%;
 	transition: all 1s;
 }
@@ -809,13 +802,34 @@ a:hover {
 	padding: 2rem 3% 1rem 4%;
 }
 
+.work-btn {
+	margin-right: 0.5rem;
+	margin-bottom: 0.5rem;
+}
+
+#buttons-work {
+	display: flex;
+	flex-wrap: wrap;
+}
+
+.w-description {
+	margin-bottom: 1rem;
+	font-size: 0.9rem;
+	color: #6c757d;
+	line-height: 1.5;
+}
+
 .work-content .w-more {
 	color: #4e4e4e;
 	font-size: 0.8rem;
+	display: flex;
+	align-items: center;
 }
 
-.work-content .w-more .w-ctegory {
+.work-content .w-more .w-role {
 	color: #0078ff;
+	font-size: 0.9em;
+	margin-left: auto;
 }
 
 .work-content .w-like {
@@ -876,197 +890,6 @@ a:hover {
 	margin: 0 auto;
 	border-radius: 50%;
 	line-height: 1.6;
-}
-
-/*======================================
-//--//-->   BLOG
-======================================*/
-
-.card-blog .card-body {
-	position: relative;
-}
-
-.card-blog .card-category-box {
-	position: absolute;
-	text-align: center;
-	top: -16px;
-	left: 15px;
-	right: 15px;
-	line-height: 25px;
-	overflow: hidden;
-}
-
-.card-blog .card-category {
-	display: inline-block;
-	color: #fff;
-	padding: 0 15px 5px;
-	overflow: hidden;
-	background-color: #0078ff;
-	border-radius: 4px;
-}
-
-.card-blog .card-category .category {
-	color: #fff;
-	display: inline-block;
-	text-transform: uppercase;
-	font-size: 0.7rem;
-	letter-spacing: 0.1px;
-	margin-bottom: 0;
-}
-
-.card-blog .card-title {
-	font-size: 1.3rem;
-	margin-top: 0.6rem;
-}
-
-.card-blog .card-description {
-	color: #4e4e4e;
-}
-
-.card-blog .post-author {
-	display: inline-block;
-}
-
-.card-blog .post-date {
-	color: #4e4e4e;
-	display: inline-block;
-	float: right;
-}
-
-/*======================================
-//--//-->   BLOG-SINGLE
-======================================*/
-
-.post-box,
-.form-comments,
-.box-comments,
-.widget-sidebar {
-	padding: 2rem;
-	background-color: #fff;
-	margin-bottom: 3rem;
-}
-
-.blog-wrapper .article-title {
-	font-size: 1.5rem;
-}
-
-.blog-wrapper .post-meta {
-	margin: 1rem 0;
-}
-
-.blog-wrapper .post-meta ul {
-	border-left: 4px solid #0078ff;
-	margin-top: 1rem;
-}
-
-.blog-wrapper .post-meta ul li {
-	display: inline-block;
-	margin-left: 15px;
-}
-
-.blog-wrapper .post-meta ul a {
-	color: #0078ff;
-}
-
-.blog-wrapper .post-meta ul span {
-	color: #1e1e1e;
-}
-
-.blog-wrapper .blockquote {
-	border-left: 4px solid #0078ff;
-	padding: 18px;
-	font-style: italic;
-}
-
-/*------/ Comments /------*/
-
-.box-comments .list-comments li {
-	padding-bottom: 40px;
-}
-
-.box-comments .list-comments .comment-avatar {
-	display: table-cell;
-	vertical-align: top;
-}
-
-.box-comments .list-comments .comment-avatar img {
-	width: 80px;
-	height: 80px;
-}
-
-.box-comments .list-comments .comment-author {
-	font-size: 1.3rem;
-}
-
-.box-comments .list-comments .comment-details {
-	display: table-cell;
-	vertical-align: top;
-	padding-left: 25px;
-}
-
-.box-comments .list-comments a {
-	color: #0078ff;
-}
-
-.box-comments .list-comments span {
-	color: #1e1e1e;
-	font-style: italic;
-}
-
-.box-comments .comment-children {
-	margin-left: 40px;
-}
-
-/*------/ Sidebar /------*/
-
-.widget-sidebar .sidebar-title {
-	font-size: 1.6rem;
-	font-weight: 600;
-	border-left: 5px solid #0078ff;
-	padding-left: 15px;
-	text-transform: uppercase;
-	margin-bottom: 1.5rem;
-}
-
-.widget-sidebar .list-sidebar li {
-	position: relative;
-	padding: 6px 0 6px 24px;
-}
-
-.widget-sidebar .list-sidebar li:before {
-	position: absolute;
-	content: "";
-	width: 10px;
-	height: 1px;
-	left: 0;
-	background-color: #0078ff;
-	top: 20px;
-}
-
-.sidebar-search input {
-	background-color: #fff;
-	border-radius: 0;
-	transition: all 0.5s ease-in-out;
-}
-
-.sidebar-search .btn-search {
-	background-color: #0078ff;
-	border-color: #0078ff;
-	border-radius: 0;
-	padding-left: 20px;
-	padding-right: 20px;
-}
-
-.widget-tags ul li {
-	display: inline-block;
-	background-color: #0078ff;
-	padding: 0.2rem 0.6rem;
-	margin-bottom: 0.5rem;
-	border-radius: 15px;
-}
-
-.widget-tags ul li a {
-	color: #fff;
 }
 
 /*======================================
