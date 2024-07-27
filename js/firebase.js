@@ -172,10 +172,10 @@ async function fetchPortfolio() {
 		portfolioCollection.forEach((doc) => {
 			const project = doc.data();
 
-			const images = project["images "] || project.images || [];
-			const imageArray = Array.isArray(images) ? images : [images];
+			// Assume 'images' field now contains Firebase Storage URLs
+			const images = project.images || [];
 
-			if (!project || !imageArray.length) {
+			if (!project || !images.length) {
 				console.error("Invalid project data:", project);
 				return;
 			}
@@ -183,30 +183,29 @@ async function fetchPortfolio() {
 			const projectId = project.id;
 
 			// Create carousel indicators
-			let carouselIndicators = "";
-			imageArray.forEach((_, index) => {
-				carouselIndicators += `
-                    <li data-target="#carousel-${projectId}" data-slide-to="${index}" ${
-					index === 0 ? 'class="active"' : ""
-				}></li>
-                `;
-			});
+			let carouselIndicators = images
+				.map(
+					(_, index) => `
+                    <li data-target="#carousel-${projectId}" data-slide-to="${index}" 
+                        ${index === 0 ? 'class="active"' : ""}></li>
+                `
+				)
+				.join("");
 
 			// Create carousel items
-			let carouselItems = "";
-			imageArray.forEach((image, index) => {
-				carouselItems += `
-					<div class="carousel-item ${index === 0 ? "active" : ""}">
-						<a href="${image}" data-lightbox="gallery-${projectId}" data-title="${
-					project.title
-				} image ${index + 1}">
-							<img class="d-block w-100 img-fluid" src="${image}" alt="${
-					project.title
-				} image ${index + 1}">
-						</a>
-					</div>
-				`;
-			});
+			let carouselItems = images
+				.map(
+					(imageUrl, index) => `
+                    <div class="carousel-item ${index === 0 ? "active" : ""}">
+                        <a href="${imageUrl}" data-lightbox="gallery-${projectId}" 
+                           data-title="${project.title} image ${index + 1}">
+                            <img class="d-block w-100 img-fluid" src="${imageUrl}" 
+                                 alt="${project.title} image ${index + 1}">
+                        </a>
+                    </div>
+                `
+				)
+				.join("");
 
 			// Buttons for the work section
 			const buttonsWork = `
@@ -221,6 +220,7 @@ async function fetchPortfolio() {
 										: ""
 								}
             `;
+
 			// Role for the work section
 			const myRole = `
                 ${
@@ -230,45 +230,49 @@ async function fetchPortfolio() {
 								}
             `;
 
+			// Truncate description if it exceeds 32 words
+			const truncatedDescription = truncateText(project.description || "", 32);
+
 			portfolioHtml += `
-<div class="col-md-4">
-  <div class="work-box" id="project-${projectId}">
-    <div id="carousel-${projectId}" class="carousel slide" data-ride="carousel">
-      <ol class="carousel-indicators">
-        ${carouselIndicators}
-      </ol>
-      <div class="carousel-inner">
-        ${carouselItems}
-      </div>
-      <a class="carousel-control-prev" href="#carousel-${projectId}" role="button" data-slide="prev">
-        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-        <span class="sr-only">Previous</span>
-      </a>
-      <a class="carousel-control-next" href="#carousel-${projectId}" role="button" data-slide="next">
-        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-        <span class="sr-only">Next</span>
-      </a>
-    </div>
-    <div class="work-content">
-      <div class="row">
-        <div class="col-sm-12">
-          <div class="d-flex flex-wrap align-items-center justify-content-between">
-                                        <h2 class="w-title">${
-																					project.title
-																				}</h2>
-                                        <div class="w-more">${myRole}</div>
-                                    </div>
-		  <hr>
-          <p class="w-description">${project.description || ""}</p>
-          <div class="w-more" id="buttons-work">
-            ${buttonsWork}
-          </div>
-          
-        </div>
-      </div>
-    </div>
-  </div>
-</div>`;
+            <div class="col-md-4">
+              <div class="work-box" id="project-${projectId}">
+                <div id="carousel-${projectId}" class="carousel slide" data-ride="carousel">
+                  <ol class="carousel-indicators">
+                    ${carouselIndicators}
+                  </ol>
+                  <div class="carousel-inner">
+                    ${carouselItems}
+                  </div>
+                  <a class="carousel-control-prev" href="#carousel-${projectId}" role="button" data-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="sr-only">Previous</span>
+                  </a>
+                  <a class="carousel-control-next" href="#carousel-${projectId}" role="button" data-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="sr-only">Next</span>
+                  </a>
+                </div>
+                <div class="work-content">
+                  <div class="row">
+                    <div class="col-sm-12">
+                      <div class="d-flex flex-wrap align-items-center justify-content-between">
+                        <h2 class="w-title">${project.title}</h2>
+                        <div class="w-more">${myRole}</div>
+                      </div>
+                      <hr>
+                      <div class="w-description-container">
+                        <p class="w-description">
+                          ${truncatedDescription}
+                        </p>
+                      </div>
+                      <div class="w-more" id="buttons-work">
+                        ${buttonsWork}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>`;
 		});
 
 		const portfolioContainer = document.querySelector(
@@ -279,6 +283,9 @@ async function fetchPortfolio() {
 			// Initialize carousels
 			$(".carousel").carousel();
 
+			// Initialize description toggle
+			initializeDescriptionToggles();
+
 			// Check for project highlight after everything is loaded
 			setTimeout(highlightProject, 100);
 		} else {
@@ -287,6 +294,42 @@ async function fetchPortfolio() {
 	} catch (error) {
 		console.error("Error fetching portfolio info:", error);
 	}
+}
+
+function truncateText(text, wordLimit) {
+	const words = text.split(" ");
+	if (words.length <= wordLimit) {
+		return text;
+	}
+	const truncated = words.slice(0, wordLimit).join(" ");
+	return `<span class="truncated-text">${truncated}...</span>
+            <span class="full-text" style="display:none;">${text}</span>
+            <a href="#" class="see-more-toggle" style="color: #17a2b8;" data-collapsed="true">See more</a>`;
+}
+
+function initializeDescriptionToggles() {
+	document.querySelectorAll(".see-more-toggle").forEach((toggle) => {
+		toggle.addEventListener("click", function (event) {
+			event.preventDefault();
+			const descriptionContainer = this.closest(".w-description-container");
+			const truncatedText =
+				descriptionContainer.querySelector(".truncated-text");
+			const fullText = descriptionContainer.querySelector(".full-text");
+			const isCollapsed = this.getAttribute("data-collapsed") === "true";
+
+			if (isCollapsed) {
+				truncatedText.style.display = "none";
+				fullText.style.display = "inline";
+				this.textContent = "See less";
+				this.setAttribute("data-collapsed", "false");
+			} else {
+				truncatedText.style.display = "inline";
+				fullText.style.display = "none";
+				this.textContent = "See more";
+				this.setAttribute("data-collapsed", "true");
+			}
+		});
+	});
 }
 
 function highlightProject() {
