@@ -215,6 +215,16 @@ async function fetchPortfolio() {
 										: ""
 								}
                 ${
+									project.googlePlayUrl
+										? `<a class="btn btn-outline-info fw-bold mr-2 mb-2 work-btn" href="${project.googlePlayUrl}" target="_blank" role="button">Google Play</a>`
+										: ""
+								}
+                ${
+									project.appleStorUrl
+										? `<a class="btn btn-outline-info fw-bold mr-2 mb-2 work-btn" href="${project.appleStorUrl}" target="_blank" role="button">Apple Store</a>`
+										: ""
+								}
+                ${
 									project.sourceUrl
 										? `<a class="btn btn-outline-info fw-bold mr-2 mb-2 work-btn" href="${project.sourceUrl}" target="_blank" role="button">Source code</a>`
 										: ""
