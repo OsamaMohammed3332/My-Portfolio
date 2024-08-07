@@ -5,6 +5,8 @@ import {
 	getFirestore,
 	collection,
 	getDocs,
+	orderBy,
+	query,
 } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
 
 // Your web app's Firebase configuration
@@ -161,7 +163,9 @@ async function fetchStats() {
 // Fetch and display portfolio info
 async function fetchPortfolio() {
 	try {
-		const portfolioCollection = await getDocs(collection(db, "portfolio"));
+		const portfolioCollection = await getDocs(
+			query(collection(db, "portfolio"), orderBy("id", "desc"))
+		);
 
 		if (portfolioCollection.empty) {
 			console.log("No documents found in the portfolio collection");
