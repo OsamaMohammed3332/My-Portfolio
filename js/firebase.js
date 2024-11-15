@@ -386,10 +386,12 @@ async function fetchContactInfo() {
 		const contactDoc = await getDocs(collection(db, "contactInfo"));
 		const contactData = contactDoc.docs[0].data();
 		document.querySelector(".socials ul").innerHTML = `
-<li><a href="${contactData.facebook}" target="_blank"><span class="ico-circle"><i class="ion-social-facebook"></i></span></a></li>
-<li><a href="${contactData.linkedin}" target="_blank"><span class="ico-circle"><i class="ion-social-linkedin"></i></span></a></li>
-<li><a href="mailto:${contactData.email}"><span class="ico-circle"><i class="ion-social-googleplus"></i></span></a></li>
-<li><a href="${contactData.github}" target="_blank"><span class="ico-circle"><i class="ion-social-github"></i></span></a></li>`;
+		<li><a href="${contactData.linkedin}" target="_blank"><span class="ico-circle"><i class="fab fa-linkedin"></i></span></a></li>
+		<li><a href="${contactData.upwork}" target="_blank"><span class="ico-circle"><i class="fab fa-square-upwork"></i></span></a></li>
+		<li><a href="mailto:${contactData.email}"><span class="ico-circle"><i class="fab fa-google-plus-g"></i></span></a></li>
+		<li><a href="${contactData.github}" target="_blank"><span class="ico-circle"><i class="fab fa-github"></i></span></a></li>
+		<li><a href="${contactData.facebook}" target="_blank"><span class="ico-circle"><i class="fab fa-facebook-f"></i></span></a></li>
+		`;
 	} catch (error) {
 		console.error("Error fetching contact info:", error);
 	}
