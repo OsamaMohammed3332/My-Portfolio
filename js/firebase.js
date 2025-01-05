@@ -43,8 +43,19 @@ document.addEventListener("DOMContentLoaded", async () => {
 		// Load data sequentially
 		await fetchProfileInfo(db);
 		await fetchAboutMe(db);
-		await fetchStats(db); // No setTimeout needed
 		await fetchPortfolio(db);
+
+		// Add delay for stats if there's a project parameter
+		const urlParams = new URLSearchParams(window.location.search);
+		const hasProjectParam = urlParams.has("project");
+
+		if (hasProjectParam) {
+			// Wait for project highlighting to complete
+			setTimeout(() => fetchStats(db), 1000);
+		} else {
+			await fetchStats(db);
+		}
+
 		await fetchContactInfo(db);
 	} catch (error) {
 		console.error("Error initializing app:", error);

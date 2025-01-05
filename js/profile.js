@@ -80,43 +80,50 @@ export async function fetchStats(db) {
 			return;
 		}
 
-		// Get elements
-		const worksCompletedEl = document.querySelector("#works-completed");
-		const yearsExperienceEl = document.querySelector("#years-of-experience");
+		// Function to animate counter with better handling
+		function animateCounter(element, target) {
+			if (!element) return;
 
-		// Set initial values to 0
-		worksCompletedEl.textContent = "0";
-		yearsExperienceEl.textContent = "0";
+			// Clear any existing animation
+			if (element._countAnimation) {
+				clearInterval(element._countAnimation);
+			}
 
-		// Update with actual values after a short delay
-		setTimeout(() => {
-			// Update DOM elements
-			worksCompletedEl.textContent = statsData.worksCompleted || "0";
-			yearsExperienceEl.textContent = statsData.yearsOfExperience || "0";
+			let current = 0;
+			const duration = 2000; // 2 seconds total
+			const steps = 50;
+			const increment = Math.ceil(target / steps);
+			const interval = duration / steps;
 
-			// Initialize counter animation
-			$(".counter").each(function () {
-				$(this)
-					.prop("Counter", 0)
-					.animate(
-						{
-							Counter: $(this).text(),
-						},
-						{
-							duration: 2000,
-							easing: "swing",
-							step: function (now) {
-								$(this).text(Math.ceil(now));
-							},
-						}
-					);
-			});
-		}, 100);
+			element._countAnimation = setInterval(() => {
+				current = Math.min(current + increment, target);
+				element.textContent = current;
+
+				if (current >= target) {
+					clearInterval(element._countAnimation);
+					element._countAnimation = null;
+				}
+			}, interval);
+		}
+
+		// Ensure elements exist before animating
+		const worksElement = document.querySelector("#works-completed");
+		const yearsElement = document.querySelector("#years-of-experience");
+
+		if (statsData.worksCompleted && worksElement) {
+			animateCounter(worksElement, parseInt(statsData.worksCompleted));
+		}
+		if (statsData.yearsOfExperience && yearsElement) {
+			animateCounter(yearsElement, parseInt(statsData.yearsOfExperience));
+		}
 	} catch (error) {
 		console.error("Error fetching stats:", error);
-		// Set fallback values if there's an error
-		document.querySelector("#works-completed").textContent = "0";
-		document.querySelector("#years-of-experience").textContent = "0";
+		// Set fallback values
+		const elements = ["#works-completed", "#years-of-experience"];
+		elements.forEach((id) => {
+			const element = document.querySelector(id);
+			if (element) element.textContent = "0";
+		});
 	}
 }
 
