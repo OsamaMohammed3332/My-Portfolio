@@ -290,7 +290,6 @@ a:hover {
 
 .owl-theme .owl-dots .owl-dot.active span {
 	background-color: #1b1b1b;
-	width: 25px;
 }
 
 /*--/ Scrolltop s /--*/
@@ -392,6 +391,37 @@ a:hover {
 		-webkit-transform: rotate(360deg);
 		transform: rotate(360deg);
 	}
+}
+
+/* Add these styles for lazy loading */
+.lazy-load {
+    opacity: 0;
+    transition: opacity 0.3s ease-in;
+    min-height: 290px; /* Match your carousel-item img height */
+    background: #f0f0f0; /* Light gray placeholder */
+}
+
+.lazy-load.loaded {
+    opacity: 1;
+}
+
+/* Add spinner for lazy loading */
+.lazy-load::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 30px;
+    height: 30px;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #0078ff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: translate(-50%, -50%) rotate(0deg); }
+    100% { transform: translate(-50%, -50%) rotate(360deg); }
 }
 
 /*======================================
