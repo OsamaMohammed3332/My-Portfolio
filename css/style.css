@@ -798,6 +798,11 @@ a:hover {
 	z-index: 5;
 }
 
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+	filter: drop-shadow(3px 3px 3px rgba(0, 0, 0, 0.5));
+}
+
 .work-img {
 	display: block;
 	overflow: hidden;

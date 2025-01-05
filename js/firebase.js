@@ -163,55 +163,71 @@ async function fetchStats() {
 // Fetch and display portfolio info
 async function fetchPortfolio() {
 	try {
+		// Add loading indicator
+		const portfolioContainer = document.querySelector(
+			"#work .row-work-content"
+		);
+		portfolioContainer.innerHTML = `
+			<div class="col-12 text-center" id="portfolio-loader">
+				<div class="spinner-border text-info" role="status">
+					<span class="sr-only">Loading...</span>
+				</div>
+				<p class="mt-2">Loading projects...</p>
+			</div>
+		`;
+
 		const portfolioCollection = await getDocs(
 			query(collection(db, "portfolio"), orderBy("id", "desc"))
 		);
 
 		if (portfolioCollection.empty) {
 			console.log("No documents found in the portfolio collection");
+			portfolioContainer.innerHTML =
+				'<div class="col-12 text-center">No projects found</div>';
 			return;
 		}
 
-		let portfolioHtml = "";
-		portfolioCollection.forEach((doc) => {
-			const project = doc.data();
+		// Clear the loading indicator
+		portfolioContainer.innerHTML = "";
 
-			// Assume 'images' field now contains Firebase Storage URLs
+		// Convert documents to array for easier handling
+		const projects = portfolioCollection.docs.map((doc) => doc.data());
+
+		// Function to add a single project
+		const addProject = async (project, index) => {
 			const images = project.images || [];
-
 			if (!project || !images.length) {
 				console.error("Invalid project data:", project);
 				return;
 			}
 
 			const projectId = project.id;
-
-			// Create carousel indicators
-			let carouselIndicators = images
+			const carouselIndicators = images
 				.map(
 					(_, index) => `
-                    <li data-target="#carousel-${projectId}" data-slide-to="${index}" 
-                        ${index === 0 ? 'class="active"' : ""}></li>
+                    <li data-target="#carousel-${projectId}" data-slide-to="${index}" ${
+						index === 0 ? 'class="active"' : ""
+					}></li>
                 `
 				)
 				.join("");
 
-			// Create carousel items
-			let carouselItems = images
+			const carouselItems = images
 				.map(
 					(imageUrl, index) => `
                     <div class="carousel-item ${index === 0 ? "active" : ""}">
-                        <a href="${imageUrl}" data-lightbox="gallery-${projectId}" 
-                           data-title="${project.title} image ${index + 1}">
-                            <img class="d-block w-100 img-fluid" src="${imageUrl}" 
-                                 alt="${project.title} image ${index + 1}">
+                        <a href="${imageUrl}" data-lightbox="gallery-${projectId}" data-title="${
+						project.title
+					} image ${index + 1}">
+                            <img class="d-block w-100 img-fluid" src="${imageUrl}" alt="${
+						project.title
+					} image ${index + 1}">
                         </a>
                     </div>
                 `
 				)
 				.join("");
 
-			// Buttons for the work section
 			const buttonsWork = `
                 ${
 									project.liveUrl
@@ -235,78 +251,90 @@ async function fetchPortfolio() {
 								}
             `;
 
-			// Role for the work section
-			const myRole = `
-                ${
-									project.role
-										? `<span class="w-role">${project.role}</span>`
-										: ""
-								}
-            `;
-
-			// Truncate description if it exceeds 32 words
+			const myRole = `${
+				project.role ? `<span class="w-role">${project.role}</span>` : ""
+			}`;
 			const truncatedDescription = truncateText(project.description || "", 32);
 
-			portfolioHtml += `
-            <div class="col-md-4">
-              <div class="work-box" id="project-${projectId}">
-                <div id="carousel-${projectId}" class="carousel slide" data-ride="carousel">
-                  <ol class="carousel-indicators">
-                    ${carouselIndicators}
-                  </ol>
-                  <div class="carousel-inner">
-                    ${carouselItems}
-                  </div>
-                  <a class="carousel-control-prev" href="#carousel-${projectId}" role="button" data-slide="prev">
-                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                    <span class="sr-only">Previous</span>
-                  </a>
-                  <a class="carousel-control-next" href="#carousel-${projectId}" role="button" data-slide="next">
-                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                    <span class="sr-only">Next</span>
-                  </a>
-                </div>
-                <div class="work-content">
-                  <div class="row">
-                    <div class="col-sm-12">
-                      <div class="d-flex flex-wrap align-items-center justify-content-between">
-                        <h2 class="w-title">${project.title}</h2>
-                        <div class="w-more">${myRole}</div>
-                      </div>
-                      <hr>
-                      <div class="w-description-container">
-                        <p class="w-description">
-                          ${truncatedDescription}
-                        </p>
-                      </div>
-                      <div class="w-more" id="buttons-work">
-                        ${buttonsWork}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>`;
-		});
+			const projectElement = document.createElement("div");
+			projectElement.className = "col-md-4";
+			projectElement.style.opacity = "0";
+			projectElement.style.transform = "translateY(20px)";
+			projectElement.style.transition =
+				"opacity 0.5s ease, transform 0.5s ease";
 
+			projectElement.innerHTML = `
+                <div class="work-box" id="project-${projectId}">
+                    <div id="carousel-${projectId}" class="carousel slide" data-ride="carousel">
+                        <ol class="carousel-indicators">
+                            ${carouselIndicators}
+                        </ol>
+                        <div class="carousel-inner">
+                            ${carouselItems}
+                        </div>
+                        ${
+													images.length > 1
+														? `
+                            <a class="carousel-control-prev" href="#carousel-${projectId}" role="button" data-slide="prev">
+                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                <span class="sr-only">Previous</span>
+                            </a>
+                            <a class="carousel-control-next" href="#carousel-${projectId}" role="button" data-slide="next">
+                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                <span class="sr-only">Next</span>
+                            </a>
+                        `
+														: ""
+												}
+                    </div>
+                    <div class="work-content">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="d-flex flex-wrap align-items-center justify-content-between">
+                                    <h2 class="w-title">${project.title}</h2>
+                                    <div class="w-more">${myRole}</div>
+                                </div>
+                                <hr>
+                                <div class="w-description-container">
+                                    <p class="w-description">
+                                        ${truncatedDescription}
+                                    </p>
+                                </div>
+                                <div class="w-more" id="buttons-work">
+                                    ${buttonsWork}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+			portfolioContainer.appendChild(projectElement);
+
+			// Trigger reflow and add animation
+			setTimeout(() => {
+				projectElement.style.opacity = "1";
+				projectElement.style.transform = "translateY(0)";
+			}, 100 * index);
+
+			// Initialize carousel for this project
+			$(`#carousel-${projectId}`).carousel();
+		};
+
+		// Add projects one by one with a delay
+		for (let i = 0; i < projects.length; i++) {
+			await addProject(projects[i], i);
+		}
+
+		initializeDescriptionToggles();
+		setTimeout(highlightProject, 100);
+	} catch (error) {
+		console.error("Error fetching portfolio info:", error);
 		const portfolioContainer = document.querySelector(
 			"#work .row-work-content"
 		);
-		if (portfolioContainer) {
-			portfolioContainer.innerHTML = portfolioHtml;
-			// Initialize carousels
-			$(".carousel").carousel();
-
-			// Initialize description toggle
-			initializeDescriptionToggles();
-
-			// Check for project highlight after everything is loaded
-			setTimeout(highlightProject, 100);
-		} else {
-			console.error("Portfolio container not found in the DOM");
-		}
-	} catch (error) {
-		console.error("Error fetching portfolio info:", error);
+		portfolioContainer.innerHTML =
+			'<div class="col-12 text-center">Error loading projects</div>';
 	}
 }
 
