@@ -43,7 +43,7 @@ export async function fetchAboutMe(db) {
             <div class="col-sm-6 col-md-7">
                 <div class="about-info">
                     <p><span class="title-s">Name: </span><span>${aboutData.name}</span></p>
-                    <p style="word-wrap:break-word"><span class="title-s">Email: </span><span>${aboutData.email}</span></p>
+                    <p style="word-wrap: break-word;"><span class="title-s">Email: </span><span>${aboutData.email}</span></p>
                     <p><span class="title-s">Phone: </span><span>${aboutData.phone}</span></p>
                 </div>
             </div>`;
@@ -73,25 +73,50 @@ export async function fetchAboutMe(db) {
 export async function fetchStats(db) {
 	try {
 		const statsDoc = await getDocs(collection(db, "stats"));
-		if (statsDoc.docs.length > 0) {
-			const statsData = statsDoc.docs[0].data();
+		const statsData = statsDoc.docs[0]?.data();
 
-			// Simply update the HTML with fetched data
-			document.querySelector("#works-completed").innerText =
-				statsData.worksCompleted;
-			document.querySelector("#years-of-experience").innerText =
-				statsData.yearsOfExperience;
-
-			// Initialize counter after setting values
-			$(".counter").counterUp({
-				delay: 10,
-				time: 1000,
-			});
-		} else {
-			console.error("No stats info found");
+		if (!statsData) {
+			console.error("No stats data found");
+			return;
 		}
+
+		// Get elements
+		const worksCompletedEl = document.querySelector("#works-completed");
+		const yearsExperienceEl = document.querySelector("#years-of-experience");
+
+		// Set initial values to 0
+		worksCompletedEl.textContent = "0";
+		yearsExperienceEl.textContent = "0";
+
+		// Update with actual values after a short delay
+		setTimeout(() => {
+			// Update DOM elements
+			worksCompletedEl.textContent = statsData.worksCompleted || "0";
+			yearsExperienceEl.textContent = statsData.yearsOfExperience || "0";
+
+			// Initialize counter animation
+			$(".counter").each(function () {
+				$(this)
+					.prop("Counter", 0)
+					.animate(
+						{
+							Counter: $(this).text(),
+						},
+						{
+							duration: 2000,
+							easing: "swing",
+							step: function (now) {
+								$(this).text(Math.ceil(now));
+							},
+						}
+					);
+			});
+		}, 100);
 	} catch (error) {
-		console.error("Error fetching stats info:", error);
+		console.error("Error fetching stats:", error);
+		// Set fallback values if there's an error
+		document.querySelector("#works-completed").textContent = "0";
+		document.querySelector("#years-of-experience").textContent = "0";
 	}
 }
 
