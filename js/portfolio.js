@@ -84,8 +84,8 @@ export function generateProjectHTML(project) {
 						: ""
 				}
         ${
-					project.appleStoreUrl
-						? `<a class="btn btn-outline-info fw-bold mr-2 mb-2 work-btn" href="${project.appleStoreUrl}" target="_blank" role="button">Apple Store</a>`
+					project.appleStorUrl
+						? `<a class="btn btn-outline-info fw-bold mr-2 mb-2 work-btn" href="${project.appleStorUrl}" target="_blank" role="button">Apple Store</a>`
 						: ""
 				}
         ${
@@ -98,7 +98,7 @@ export function generateProjectHTML(project) {
 	const myRole = project.role
 		? `<span class="w-role">${project.role}</span>`
 		: "";
-	const truncatedDescription = truncateText(project.description || "", 32);
+	const truncatedDescription = truncateText(project.description || "", 200);
 
 	return `
         <div class="work-box" id="project-${project.id}">

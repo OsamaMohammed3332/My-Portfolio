@@ -1,9 +1,8 @@
-export function truncateText(text, wordLimit) {
-	const words = text.split(" ");
-	if (words.length <= wordLimit) {
+export function truncateText(text, charLimit) {
+	if (text.length <= charLimit) {
 		return text;
 	}
-	const truncated = words.slice(0, wordLimit).join(" ");
+	const truncated = text.slice(0, charLimit);
 	return `<span class="truncated-text">${truncated}...</span>
             <span class="full-text" style="display:none;">${text}</span>
             <a href="#" class="see-more-toggle" style="color: #17a2b8;" data-collapsed="true">See more</a>`;
