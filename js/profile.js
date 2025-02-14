@@ -30,43 +30,94 @@ export async function fetchProfileInfo(db) {
 
 export async function fetchAboutMe(db) {
 	try {
-		const aboutDoc = await getDocs(collection(db, "aboutMe"));
-		const aboutData = aboutDoc.docs[1].data();
+		const aboutMeContainer = document.querySelector("#about .box-shadow-full");
+		const rowAboutMe = document.querySelector("#about .row-about-me");
+		const skillsTitle = document.querySelector(".skills-title");
+		const aboutTitle = document.querySelector(".about-me .title-box-2");
+		const skillsContainer = document.querySelector(".skill-mf");
+		const aboutDescription = document.querySelector("#about-me-description");
 
-		// Update About Me section
-		document.querySelector("#about .row-about-me").innerHTML = `
-            <div class="col-sm-6 col-md-5">
-                <div class="about-img">
-                    <img src="${aboutData.imageUrl}" class="img-fluid rounded b-shadow-a" alt=""/>
-                </div>
-            </div>
-            <div class="col-sm-6 col-md-7">
-                <div class="about-info">
-                    <p><span class="title-s">Name: </span><span>${aboutData.name}</span></p>
-                    <p style="word-wrap: break-word;"><span class="title-s">Email: </span><span>${aboutData.email}</span></p>
-                    <p><span class="title-s">Phone: </span><span>${aboutData.phone}</span></p>
+		// Show loading state
+		aboutMeContainer.innerHTML = `
+            <div class="row">
+                <div class="col-12">
+                    <div class="loading-wrapper">
+                        <div class="modern-loader">
+                            <div></div><div></div><div></div>
+                            <div></div><div></div><div></div>
+                            <div></div><div></div><div></div>
+                        </div>
+                        <div class="loading-text">
+                            Loading About<span>.</span><span>.</span><span>.</span>
+                        </div>
+                    </div>
                 </div>
             </div>`;
 
-		document.querySelector("#about-me-description").innerText =
-			aboutData.description;
-
-		// Skills
+		// Fetch data
+		const aboutDoc = await getDocs(collection(db, "aboutMe"));
+		const aboutData = aboutDoc.docs[1].data();
 		const skills = aboutDoc.docs[0].data();
-		const skillsContainer = document.querySelector(".skill-mf");
-		skillsContainer.innerHTML = ""; // Clear existing content
 
-		skills.skills.forEach((skill) => {
-			skillsContainer.innerHTML += `
-                <span>${skill}</span>
-                <div class="progress">
-                    <div class="progress-bar" role="progressbar" style="width: 100%" 
-                         aria-valuenow="85" aria-valuemin="0" aria-valuemax="100">
+		// Update content
+		aboutMeContainer.innerHTML = `
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="row row-about-me">
+                        <div class="col-sm-6 col-md-5">
+                            <div class="about-img">
+                                <img src="${
+																	aboutData.imageUrl
+																}" class="img-fluid rounded b-shadow-a" alt=""/>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-md-7">
+                            <div class="about-info">
+                                <p><span class="title-s">Name: </span><span>${
+																	aboutData.name
+																}</span></p>
+                                <p><span class="title-s">Phone: </span><span>${
+																	aboutData.phone
+																}</span></p>
+                            </div>
+                        </div>
                     </div>
-                </div>`;
-		});
+                    <div class="title-box-2 skills-title">
+                        <h5 class="title-left">Skills</h5>
+                    </div>
+                    <div class="skill-mf">
+                        ${skills.skills
+													.map(
+														(skill) => `
+                            <span>${skill}</span>
+                            <div class="progress">
+                                <div class="progress-bar" role="progressbar" style="width: 100%" 
+                                     aria-valuenow="85" aria-valuemin="0" aria-valuemax="100">
+                                </div>
+                            </div>`
+													)
+													.join("")}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="about-me pt-4 pt-md-0">
+                        <div class="title-box-2">
+                            <h5 class="title-left">About me</h5>
+                        </div>
+                        <p class="lead">${aboutData.description}</p>
+                    </div>
+                </div>
+            </div>`;
 	} catch (error) {
 		console.error("Error fetching about me info:", error);
+		if (aboutMeContainer) {
+			aboutMeContainer.innerHTML = `
+                <div class="row">
+                    <div class="col-12 text-center text-danger">
+                        Error loading about section
+                    </div>
+                </div>`;
+		}
 	}
 }
 
@@ -111,10 +162,10 @@ export async function fetchStats(db) {
 		const yearsElement = document.querySelector("#years-of-experience");
 
 		if (statsData.worksCompleted && worksElement) {
-			animateCounter(worksElement, parseInt(statsData.worksCompleted));
+			animateCounter(worksElement, parseFloat(statsData.worksCompleted));
 		}
 		if (statsData.yearsOfExperience && yearsElement) {
-			animateCounter(yearsElement, parseInt(statsData.yearsOfExperience));
+			animateCounter(yearsElement, parseFloat(statsData.yearsOfExperience));
 		}
 	} catch (error) {
 		console.error("Error fetching stats:", error);

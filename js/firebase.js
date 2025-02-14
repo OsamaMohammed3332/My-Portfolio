@@ -21,6 +21,7 @@ import {
 	initializeDescriptionToggles,
 	highlightProject,
 } from "./portfolio.js";
+import { initializeContactForm } from "./contact.js";
 
 const firebaseConfig = {
 	apiKey: "AIzaSyChc5kg1R4Ek9dGSbg03dim0Riet4sspak",
@@ -57,6 +58,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 		}
 
 		await fetchContactInfo(db);
+
+		// Initialize contact form
+		initializeContactForm();
 	} catch (error) {
 		console.error("Error initializing app:", error);
 	}
@@ -68,13 +72,16 @@ async function fetchPortfolio(db) {
 			"#work .row-work-content"
 		);
 		portfolioContainer.innerHTML = `
-            <div class="col-12 text-center" id="portfolio-loader">
-                <div class="spinner-border text-info" role="status">
-                    <span class="sr-only">Loading...</span>
+            <div class="col-12 loading-wrapper">
+                <div class="modern-loader">
+                    <div></div><div></div><div></div>
+                    <div></div><div></div><div></div>
+                    <div></div><div></div><div></div>
                 </div>
-                <p class="mt-2">Loading projects...</p>
-            </div>
-        `;
+                <div class="loading-text">
+                    Loading Projects<span>.</span><span>.</span><span>.</span>
+                </div>
+            </div>`;
 
 		const portfolioCollection = await getDocs(
 			query(collection(db, "portfolio"), orderBy("id", "desc"))

@@ -25,6 +25,7 @@
 
 		<!-- Main Stylesheet File -->
 		<link href="css/style.css" rel="stylesheet" />
+		<link href="css/main.css" rel="stylesheet" />
 
 		<style>
 			.loading-indicator {
@@ -108,23 +109,7 @@
 				<div class="row">
 					<div class="col-sm-12">
 						<div class="box-shadow-full">
-							<div class="row">
-								<div class="col-md-6">
-									<div class="row row-about-me"></div>
-									<div class="title-box-2 skills-title">
-										<h5 class="title-left">Skills</h5>
-									</div>
-									<div class="skill-mf"></div>
-								</div>
-								<div class="col-md-6">
-									<div class="about-me pt-4 pt-md-0">
-										<div class="title-box-2">
-											<h5 class="title-left">About me</h5>
-										</div>
-										<p id="about-me-description" class="lead"></p>
-									</div>
-								</div>
-							</div>
+							<!-- Content will be dynamically inserted here -->
 						</div>
 					</div>
 				</div>
@@ -193,30 +178,75 @@
 		>
 			<div class="overlay-mf"></div>
 			<div class="container">
-				<div class="row">
-					<div class="col-sm-12">
-						<div class="contact-mf">
-							<div id="contact" class="box-shadow-full">
-								<div class="row">
-									<div class="col-md-12">
-										<div class="title-box-2 pt-4 pt-md-0">
-											<h5 class="title-left d-flex justify-content-center">
-												Get in Touch
-											</h5>
-										</div>
-										<div class="socials">
-											<ul class="d-flex justify-content-center">
-												<!-- Social links will be inserted here by the script -->
-											</ul>
-										</div>
+				<div id="contact" class="box-shadow-full">
+					<div class="row g-4 align-items-stretch">
+						<div class="col-md-6">
+							<div class="contact-info">
+								<div class="title-box-2">
+									<h5 class="title-left">Send Message</h5>
+								</div>
+								<!-- Add these message elements -->
+								<div id="sendmessage" class="alert">
+									Your message has been sent. Thank you!
+								</div>
+								<div id="errormessage" class="alert">
+									Failed to send message. Please try again.
+								</div>
+								<!-- Form starts here -->
+								<form class="contactForm">
+									<div class="form-group">
+										<input
+											type="text"
+											class="form-control"
+											name="name"
+											placeholder="Your Name"
+										/>
 									</div>
+									<div class="form-group">
+										<input
+											type="email"
+											class="form-control"
+											name="email"
+											placeholder="Your Email"
+										/>
+									</div>
+									<div class="form-group">
+										<input
+											type="text"
+											class="form-control"
+											name="subject"
+											placeholder="Subject"
+										/>
+									</div>
+									<div class="form-group">
+										<textarea
+											class="form-control"
+											name="message"
+											placeholder="Message"
+										></textarea>
+									</div>
+									<button type="submit" class="button button-big button-rouded">
+										Send Message
+									</button>
+								</form>
+							</div>
+						</div>
+						<div class="col-md-6">
+							<div class="contact-connect">
+								<div class="title-box-2">
+									<h5 class="title-left">Get in Touch</h5>
+								</div>
+								<div class="socials">
+									<ul>
+										<!-- Social links will be inserted here -->
+									</ul>
 								</div>
 							</div>
 						</div>
 					</div>
 				</div>
 			</div>
-			<footer>
+			<footer class="footer">
 				<div class="container">
 					<div class="row">
 						<div class="col-sm-12">

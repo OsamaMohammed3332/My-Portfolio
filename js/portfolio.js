@@ -10,10 +10,10 @@ export function createProjectElement(project, index) {
 	}
 
 	const projectElement = document.createElement("div");
-	projectElement.className = "col-md-4";
+	projectElement.className = "col-md-4 project-item";
 	projectElement.style.opacity = "0";
 	projectElement.style.transform = "translateY(20px)";
-	projectElement.style.transition = "opacity 0.5s ease, transform 0.5s ease";
+	projectElement.style.willChange = "transform, opacity";
 
 	try {
 		// Validate required fields before generating HTML
@@ -23,6 +23,17 @@ export function createProjectElement(project, index) {
 			);
 		}
 		projectElement.innerHTML = generateProjectHTML(project);
+
+		// Use requestAnimationFrame for smoother animation
+		requestAnimationFrame(() => {
+			projectElement.style.transition =
+				"transform 0.4s ease-out, opacity 0.4s ease-out";
+			// Stagger the animations with reduced delay
+			setTimeout(() => {
+				projectElement.style.opacity = "1";
+				projectElement.style.transform = "translateY(0)";
+			}, index * 100); // Reduced from 50 * index to smoother 100ms intervals
+		});
 	} catch (error) {
 		console.error("Error generating project HTML:", {
 			error: error.message,
@@ -35,11 +46,6 @@ export function createProjectElement(project, index) {
 								}</p>
             </div>`;
 	}
-
-	setTimeout(() => {
-		projectElement.style.opacity = "1";
-		projectElement.style.transform = "translateY(0)";
-	}, 50 * index);
 
 	return projectElement;
 }
