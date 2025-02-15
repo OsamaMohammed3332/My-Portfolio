@@ -1,7 +1,8 @@
+import { emailConfig } from "./config.js";
+
 export function initializeContactForm() {
-	// Initialize EmailJS with environment variable
-	const publicKey = process.env.EMAILJS_PUBLIC_KEY || "";
-	emailjs.init(publicKey);
+	// Initialize EmailJS with config
+	emailjs.init(emailConfig.publicKey);
 
 	const form = document.querySelector(".contactForm");
 	const submitButton = form.querySelector('button[type="submit"]');
@@ -176,15 +177,21 @@ export function initializeContactForm() {
 
 	async function sendMessage(data) {
 		try {
-			const serviceId = process.env.EMAILJS_SERVICE_ID || "";
-			const templateId = process.env.EMAILJS_TEMPLATE_ID || "";
-
-			const response = await emailjs.send(serviceId, templateId, {
+			const templateParams = {
+				to_name: "Osama", // The name of the recipient (you)
 				from_name: data.name,
 				from_email: data.email,
 				subject: data.subject,
 				message: data.message,
-			});
+				reply_to: data.email,
+			};
+
+			const response = await emailjs.send(
+				emailConfig.serviceId,
+				emailConfig.templateId,
+				templateParams,
+				emailConfig.publicKey
+			);
 			return response;
 		} catch (error) {
 			console.error("EmailJS Error:", error);

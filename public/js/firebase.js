@@ -83,9 +83,8 @@ async function fetchPortfolio(db) {
                 </div>
             </div>`;
 
-		const portfolioCollection = await getDocs(
-			query(collection(db, "portfolio"), orderBy("id", "desc"))
-		);
+		// Fetch all documents first
+		const portfolioCollection = await getDocs(collection(db, "portfolio"));
 		if (portfolioCollection.empty) {
 			portfolioContainer.innerHTML =
 				'<div class="col-12 text-center">No projects found</div>';
@@ -96,21 +95,20 @@ async function fetchPortfolio(db) {
 		const projects = portfolioCollection.docs
 			.map((doc) => {
 				const data = doc.data();
-				// Add better debug logging
-				// console.log("Project data details:", {
-				// 	id: data.id,
-				// 	title: data.title,
-				// 	imagesCount: data.images?.length || 0
-				// });
-
 				// Validate required fields
 				if (!data.id || !data.title || !data.images || !data.images.length) {
 					console.error("Invalid project data structure:", data);
 					return null;
 				}
-				return data;
+				// Convert id to number to ensure proper sorting
+				return {
+					...data,
+					numericId: parseInt(data.id, 10),
+				};
 			})
-			.filter((project) => project !== null); // Remove invalid projects
+			.filter((project) => project !== null) // Remove invalid projects
+			// Sort by numericId in descending order
+			.sort((a, b) => b.numericId - a.numericId);
 
 		if (!projects.length) {
 			portfolioContainer.innerHTML =
