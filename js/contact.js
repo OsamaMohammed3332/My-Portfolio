@@ -1,4 +1,8 @@
 export function initializeContactForm() {
+	// Initialize EmailJS with environment variable
+	const publicKey = process.env.EMAILJS_PUBLIC_KEY || "";
+	emailjs.init(publicKey);
+
 	const form = document.querySelector(".contactForm");
 	const submitButton = form.querySelector('button[type="submit"]');
 	const originalButtonText = submitButton.innerHTML;
@@ -21,7 +25,10 @@ export function initializeContactForm() {
 			await sendMessage(getFormData());
 
 			// Show success message
-			showMessage("success", "Message sent successfully!");
+			showMessage(
+				"success",
+				"Message sent successfully!, Thank you for reaching out to me."
+			);
 			form.reset();
 		} catch (error) {
 			showMessage("error", "Failed to send message. Please try again.");
@@ -168,11 +175,20 @@ export function initializeContactForm() {
 	}
 
 	async function sendMessage(data) {
-		// Replace this with your actual API call
-		return new Promise((resolve) => {
-			setTimeout(() => {
-				resolve({ success: true });
-			}, 2000);
-		});
+		try {
+			const serviceId = process.env.EMAILJS_SERVICE_ID || "";
+			const templateId = process.env.EMAILJS_TEMPLATE_ID || "";
+
+			const response = await emailjs.send(serviceId, templateId, {
+				from_name: data.name,
+				from_email: data.email,
+				subject: data.subject,
+				message: data.message,
+			});
+			return response;
+		} catch (error) {
+			console.error("EmailJS Error:", error);
+			throw error;
+		}
 	}
 }

@@ -24,7 +24,6 @@
 		<link href="lib/lightbox/css/lightbox.min.css" rel="stylesheet" />
 
 		<!-- Main Stylesheet File -->
-		<link href="css/style.css" rel="stylesheet" />
 		<link href="css/main.css" rel="stylesheet" />
 
 		<style>
@@ -179,20 +178,22 @@
 			<div class="overlay-mf"></div>
 			<div class="container">
 				<div id="contact" class="box-shadow-full">
-					<div class="row g-4 align-items-stretch">
-						<div class="col-md-6">
+					<div class="row">
+						<div class="col-12">
 							<div class="contact-info">
 								<div class="title-box-2">
-									<h5 class="title-left">Send Message</h5>
+									<h5 class="title-left">Contact Me</h5>
 								</div>
-								<!-- Add these message elements -->
+
+								<!-- Message alerts -->
 								<div id="sendmessage" class="alert">
-									Your message has been sent. Thank you!
+									Your message has been sent. Thank you !
 								</div>
 								<div id="errormessage" class="alert">
 									Failed to send message. Please try again.
 								</div>
-								<!-- Form starts here -->
+
+								<!-- Contact Form -->
 								<form class="contactForm">
 									<div class="form-group">
 										<input
@@ -230,12 +231,9 @@
 									</button>
 								</form>
 							</div>
-						</div>
-						<div class="col-md-6">
-							<div class="contact-connect">
-								<div class="title-box-2">
-									<h5 class="title-left">Get in Touch</h5>
-								</div>
+
+							<!-- Social Links - Remove the heading -->
+							<div class="social-links mt-5">
 								<div class="socials">
 									<ul>
 										<!-- Social links will be inserted here -->
@@ -279,6 +277,12 @@
 
 		<!-- Firebase Configuration and Data Fetching Script -->
 		<script type="module" src="js/firebase.js"></script>
+
+		<!-- EmailJS SDK -->
+		<script
+			type="text/javascript"
+			src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"
+		></script>
 
 		<!-- Template Main Javascript File -->
 		<script src="js/main.js"></script>
