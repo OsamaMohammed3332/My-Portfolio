@@ -69,6 +69,24 @@
 	color: #fff;
 }
 
+/* Add these styles for the CV button */
+#cv-button {
+	background-color: transparent;
+	border: 2px solid #fff;
+	color: #fff;
+	font-weight: 600;
+	transition: all 0.5s ease;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+}
+
+#cv-button:hover {
+	background-color: #fff;
+	color: #0078ff;
+	box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+	transform: translateY(-2px);
+}
+
 /*======================================
 //--//-->   ABOUT
 ======================================*/

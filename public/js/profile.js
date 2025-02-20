@@ -19,6 +19,11 @@ export async function fetchProfileInfo(db) {
                         <span class="text-slider-items">${rolesText}</span>
                         <strong class="text-slider"></strong>
                     </p>
+                    <div class="mt-4">
+                        <a href="#" id="cv-button" class="btn btn-primary btn-lg py-3 px-5" target="_blank" rel="noopener noreferrer">
+                            <i class="fas fa-file-pdf me-2"></i>View Resume
+                        </a>
+                    </div>
                 </div>
             </div>`;
 			initializeTyped();
@@ -131,41 +136,64 @@ export async function fetchStats(db) {
 			return;
 		}
 
-		// Function to animate counter with better handling
-		function animateCounter(element, target) {
+		// Update DOM with initial values
+		const worksElement = document.getElementById("works-completed");
+		const yearsElement = document.getElementById("years-of-experience");
+
+		if (worksElement) worksElement.textContent = "0";
+		if (yearsElement) yearsElement.textContent = "0";
+
+		// Function to animate counter more reliably
+		function animateValue(element, end, duration = 2000) {
 			if (!element) return;
 
-			// Clear any existing animation
-			if (element._countAnimation) {
-				clearInterval(element._countAnimation);
-			}
-
-			let current = 0;
-			const duration = 2000; // 2 seconds total
-			const steps = 50;
-			const increment = Math.ceil(target / steps);
-			const interval = duration / steps;
-
-			element._countAnimation = setInterval(() => {
-				current = Math.min(current + increment, target);
+			const start = 0;
+			const startTimestamp = performance.now();
+			const step = (timestamp) => {
+				const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+				const current = Math.floor(progress * (end - start) + start);
 				element.textContent = current;
 
-				if (current >= target) {
-					clearInterval(element._countAnimation);
-					element._countAnimation = null;
+				if (progress < 1) {
+					window.requestAnimationFrame(step);
+				} else {
+					element.textContent = end; // Ensure final value is exact
 				}
-			}, interval);
+			};
+
+			window.requestAnimationFrame(step);
 		}
 
-		// Ensure elements exist before animating
-		const worksElement = document.querySelector("#works-completed");
-		const yearsElement = document.querySelector("#years-of-experience");
+		// Function to start counter animation when element is in viewport
+		function startCounterWhenVisible(element, value) {
+			if (!element) return;
 
-		if (statsData.worksCompleted && worksElement) {
-			animateCounter(worksElement, parseFloat(statsData.worksCompleted));
+			const observer = new IntersectionObserver(
+				(entries) => {
+					entries.forEach((entry) => {
+						if (entry.isIntersecting) {
+							animateValue(element, value);
+							observer.disconnect(); // Only animate once
+						}
+					});
+				},
+				{
+					threshold: 0.1,
+				}
+			);
+
+			observer.observe(element);
 		}
-		if (statsData.yearsOfExperience && yearsElement) {
-			animateCounter(yearsElement, parseFloat(statsData.yearsOfExperience));
+
+		// Initialize counters
+		if (statsData.worksCompleted) {
+			startCounterWhenVisible(worksElement, parseInt(statsData.worksCompleted));
+		}
+		if (statsData.yearsOfExperience) {
+			startCounterWhenVisible(
+				yearsElement,
+				parseInt(statsData.yearsOfExperience)
+			);
 		}
 	} catch (error) {
 		console.error("Error fetching stats:", error);
@@ -182,12 +210,25 @@ export async function fetchContactInfo(db) {
 	try {
 		const contactDoc = await getDocs(collection(db, "contactInfo"));
 		const contactData = contactDoc.docs[0].data();
+
+		// Update social links
 		document.querySelector(".socials ul").innerHTML = `
-            <li><a href="${contactData.linkedin}" target="_blank"><span class="ico-circle"><i class="fab fa-linkedin"></i></span></a></li>
-            <li><a href="${contactData.upwork}" target="_blank"><span class="ico-circle"><i class="fab fa-square-upwork"></i></span></a></li>
-            <li><a href="${contactData.github}" target="_blank"><span class="ico-circle"><i class="fab fa-github"></i></span></a></li>
-            <li><a href="${contactData.facebook}" target="_blank"><span class="ico-circle"><i class="fab fa-facebook-f"></i></span></a></li>`;
+			<li><a href="${contactData.linkedin}" target="_blank"><span class="ico-circle"><i class="fab fa-linkedin"></i></span></a></li>
+			<li><a href="${contactData.upwork}" target="_blank"><span class="ico-circle"><i class="fab fa-square-upwork"></i></span></a></li>
+			<li><a href="${contactData.github}" target="_blank"><span class="ico-circle"><i class="fab fa-github"></i></span></a></li>
+			<li><a href="${contactData.facebook}" target="_blank"><span class="ico-circle"><i class="fab fa-facebook-f"></i></span></a></li>`;
+
+		// Update CV button
+		const cvButton = document.getElementById("cv-button");
+		if (cvButton && contactData.cvUrl) {
+			cvButton.href = contactData.cvUrl;
+		} else if (cvButton) {
+			cvButton.style.display = "none"; // Hide button if no CV URL
+		}
 	} catch (error) {
 		console.error("Error fetching contact info:", error);
+		// Hide CV button on error
+		const cvButton = document.getElementById("cv-button");
+		if (cvButton) cvButton.style.display = "none";
 	}
 }
