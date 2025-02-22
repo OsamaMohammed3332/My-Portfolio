@@ -1,6 +1,6 @@
 /* Components */
-@import url("components/_nav_bar.css");
-@import url("components/_some_style.css");
-@import url("components/_contact.css");
-@import url("components/_button.css");
+@import url("components/nav_bar.css");
+@import url("components/some_style.css");
+@import url("components/contact.css");
+@import url("components/button.css");
 @import url("style.css");
